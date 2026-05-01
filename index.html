@@ -2,8 +2,9 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Professional Rhythm Piano</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -15,7 +16,7 @@
     :root {
       --bg0: #050816;
       --bg1: #08111f;
-      --card: rgba(15, 23, 42, 0.86);
+      --card: rgba(15, 23, 42, 0.88);
       --line: rgba(148, 163, 184, 0.22);
       --text: #f8fafc;
       --muted: #94a3b8;
@@ -24,6 +25,13 @@
       --good: #34d399;
       --bad: #fb7185;
       --warn: #fbbf24;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      overscroll-behavior: none;
     }
 
     body {
@@ -53,7 +61,7 @@
 
     .top-bar {
       display: grid;
-      grid-template-columns: 1.3fr 0.7fr;
+      grid-template-columns: 1.2fr 0.8fr;
       gap: 18px;
       align-items: stretch;
       margin-bottom: 18px;
@@ -113,7 +121,7 @@
 
     .controls {
       display: grid;
-      grid-template-columns: 1fr 1fr 1.15fr;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
       margin-bottom: 16px;
     }
@@ -144,7 +152,8 @@
       flex-wrap: wrap;
     }
 
-    button, select {
+    button,
+    select {
       border: 0;
       outline: 0;
       border-radius: 14px;
@@ -199,6 +208,7 @@
       background: #0f172a;
       border: 1px solid rgba(255,255,255,0.08);
       cursor: pointer;
+      touch-action: none;
     }
 
     .mini-key {
@@ -243,6 +253,7 @@
       border: 1px solid rgba(148, 163, 184, 0.16);
       overflow: hidden;
       margin-bottom: 0;
+      touch-action: none;
     }
 
     .lane-lines {
@@ -292,6 +303,7 @@
       color: white;
       z-index: 3;
       border: 1px solid rgba(255,255,255,0.22);
+      pointer-events: none;
     }
 
     .fall-note.waiting {
@@ -304,17 +316,8 @@
       animation: pop 220ms ease forwards;
     }
 
-    .fall-note.miss {
-      background: linear-gradient(135deg, #ef4444, #fb7185);
-      animation: fadeOut 260ms ease forwards;
-    }
-
     @keyframes pop {
       to { transform: scale(1.25); opacity: 0; }
-    }
-
-    @keyframes fadeOut {
-      to { transform: translateY(18px); opacity: 0; }
     }
 
     .piano-shell {
@@ -343,7 +346,7 @@
       height: 270px;
       direction: ltr;
       user-select: none;
-      touch-action: manipulation;
+      touch-action: none;
     }
 
     .white-keys {
@@ -363,6 +366,8 @@
       font-weight: 900;
       letter-spacing: 0.4px;
       -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      user-select: none;
     }
 
     .white-key {
@@ -454,14 +459,47 @@
       color: var(--primary);
     }
 
-    @media (max-width: 900px) {
+    .rotate-device {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.20), transparent 35%), #020617;
+      color: white;
+      text-align: center;
+      padding: 32px;
+      place-items: center;
+    }
+
+    .rotate-device .box {
+      max-width: 420px;
+      padding: 26px;
+      border-radius: 26px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+
+    .rotate-device strong {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .rotate-device p {
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1000px) {
       body {
-        padding: 14px;
+        padding: 10px;
       }
 
       .app {
-        padding: 16px;
-        border-radius: 24px;
+        padding: 12px;
+        border-radius: 20px;
       }
 
       .top-bar,
@@ -470,15 +508,28 @@
       }
 
       .stats {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, minmax(80px, 1fr));
+      }
+
+      .hero {
+        padding: 16px;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+      }
+
+      .hero p,
+      .footer-help {
+        font-size: 13px;
       }
 
       .game-stage {
-        height: 280px;
+        height: 250px;
       }
 
       .piano {
-        height: 235px;
+        height: 205px;
       }
 
       .piano-header {
@@ -486,16 +537,116 @@
         align-items: flex-start;
       }
     }
+
+    @media (max-width: 850px) and (orientation: portrait) {
+      .rotate-device {
+        display: grid;
+      }
+
+      .app {
+        display: none;
+      }
+    }
+
+    @media (max-width: 950px) and (orientation: landscape) {
+      body {
+        padding: 8px;
+      }
+
+      .app {
+        width: 100%;
+        padding: 10px;
+      }
+
+      .hero {
+        display: none;
+      }
+
+      .top-bar {
+        grid-template-columns: 1fr;
+        margin-bottom: 8px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .stat {
+        min-height: 58px;
+        padding: 8px;
+      }
+
+      .stat strong {
+        font-size: 20px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .control-box {
+        padding: 10px;
+        border-radius: 14px;
+      }
+
+      .control-box label,
+      .control-box .label {
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+
+      button,
+      select {
+        padding: 9px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+      }
+
+      .mini-map-shell {
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+
+      .mini-map {
+        height: 38px;
+      }
+
+      .game-stage {
+        height: 185px;
+      }
+
+      .piano-shell {
+        padding: 10px;
+      }
+
+      .piano {
+        height: 150px;
+      }
+
+      .footer-help {
+        display: none;
+      }
+    }
   </style>
 </head>
+
 <body>
+  <div class="rotate-device">
+    <div class="box">
+      <strong>סובב את האייפון לרוחב</strong>
+      <p>הפסנתר בנוי למשחק במצב מאוזן כדי שהקלידים והתווים יהיו נוחים וברורים.</p>
+    </div>
+  </div>
+
   <main class="app">
     <section class="top-bar">
       <div class="hero">
         <h1>פסנתר קצב מקצועי</h1>
         <p>
-          פסנתר מלא של 88 קלידים, בחירת אזור נגינה כמו באפליקציות אמיתיות, מצב אימון עם תווים נופלים,
-          ולחיצה ארוכה שממשיכה להשמיע צליל עד שמשחררים.
+          פסנתר מלא של 88 קלידים, בחירת אזור נגינה, מצב אימון עם תווים נופלים,
+          החלקה עם העכבר/טאץ׳, ומהירות ירידה לבחירה.
         </p>
       </div>
 
@@ -516,9 +667,12 @@
       <div class="control-box">
         <span class="label">סוג צליל</span>
         <div class="btn-row">
-          <button class="wave-btn active" data-wave="sine">Soft</button>
-          <button class="wave-btn" data-wave="triangle">Warm</button>
-          <button class="wave-btn" data-wave="square">Retro</button>
+          <button class="sound-btn active" data-sound="classic">Classic</button>
+          <button class="sound-btn" data-sound="soft">Soft</button>
+          <button class="sound-btn" data-sound="warm">Warm</button>
+          <button class="sound-btn" data-sound="retro">Retro</button>
+          <button class="sound-btn" data-sound="bell">Bell</button>
+          <button class="sound-btn" data-sound="organ">Organ</button>
         </div>
       </div>
 
@@ -526,9 +680,16 @@
         <span class="label">מצב אימון</span>
         <div class="btn-row">
           <button id="startSongBtn">התחל שיר</button>
+          <button id="demoSongBtn">שמע דוגמה</button>
           <button id="stopSongBtn">עצור</button>
           <button id="resetBtn">איפוס</button>
         </div>
+      </div>
+
+      <div class="control-box">
+        <label for="fallSpeed">מהירות ירידת התווים</label>
+        <input id="fallSpeed" type="range" min="3200" max="8000" step="100" value="5200" />
+        <span class="label" id="fallSpeedLabel">מהירות נפילה: קלה</span>
       </div>
     </section>
 
@@ -549,9 +710,11 @@
       </div>
 
       <div class="control-box">
-        <span class="label">שיר נבחר — Mozart Turkish March</span>
+        <span class="label">שיר נבחר</span>
         <select id="songSelect">
           <option value="turkish">Mozart — Turkish March</option>
+          <option value="blackbird_style">Blackbird Style — Practice</option>
+          <option value="bella_ciao">Bella Ciao — Melody Practice</option>
         </select>
       </div>
     </section>
@@ -575,7 +738,7 @@
     <section class="piano-shell">
       <div class="piano-header">
         <span id="pianoRangeText">Professional 88-Key Web Piano</span>
-        <span>מקלדת מחשב: A S D F G H J K L ; ' Q R I וגם W E T Y U</span>
+        <span>לבנים: A S D F G H J K L Z X C V B N M | שחורים: Q W E R T Y U I O P</span>
       </div>
 
       <div class="piano" id="piano">
@@ -586,16 +749,16 @@
 
     <section class="footer-help">
       <strong>איך מנגנים?</strong>
-      אפשר ללחוץ עם העכבר/טאץ׳ על הקלידים. לחיצה ארוכה ממשיכה את הצליל. במצב השיר, תווים נופלים מלמעלה וצריך ללחוץ על הקליד הנכון בדיוק כשהתו מגיע לקו הזוהר.
+      התווים הלבנים הם אותיות בלבד. השחורים הם השורה העליונה. אפשר להחליק עם העכבר או האצבע על הקלידים.
     </section>
   </main>
 
   <div class="feedback-toast" id="toast">Perfect!</div>
 
   <script>
-    const WHITE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
-    const BLACK_NAMES = ["C#", "D#", "F#", "G#", "A#"];
-    const KEYBOARD_MAP = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k", "o", "l", "p", ";", "'", "q", "r", "i", "[", "]", "z", "x", "c", "v", "b", "n", "m"];
+    // אותיות בלבד. אין Enter ואין סימנים.
+    const WHITE_KEYBOARD_MAP = ["a", "s", "d", "f", "g", "h", "j", "k", "l", "z", "x", "c", "v", "b", "n", "m"];
+    const BLACK_KEYBOARD_MAP = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"];
 
     const whiteKeysEl = document.getElementById("whiteKeys");
     const blackLayerEl = document.getElementById("blackLayer");
@@ -612,21 +775,30 @@
     const comboEl = document.getElementById("comboEl");
     const accuracyEl = document.getElementById("accuracyEl");
     const volumeEl = document.getElementById("volume");
+    const fallSpeedEl = document.getElementById("fallSpeed");
+    const fallSpeedLabel = document.getElementById("fallSpeedLabel");
     const toastEl = document.getElementById("toast");
     const startSongBtn = document.getElementById("startSongBtn");
+    const demoSongBtn = document.getElementById("demoSongBtn");
     const stopSongBtn = document.getElementById("stopSongBtn");
     const resetBtn = document.getElementById("resetBtn");
-    const waveButtons = document.querySelectorAll(".wave-btn");
+    const songSelect = document.getElementById("songSelect");
+    const soundButtons = document.querySelectorAll(".sound-btn");
 
     let audioContext;
-    let waveType = "sine";
+    let currentSound = "classic";
     let visibleStartIndex = 24;
     let visibleCount = 35;
     let visibleNotes = [];
-    let activeOscillators = new Map();
-    let pressedKeyboard = new Set();
+
+    const noteToKeyboardKey = new Map();
+    const keyboardKeyToNote = new Map();
+    const activeOscillators = new Map();
+    const pressedKeyboard = new Set();
+
     let isPointerSliding = false;
     let currentPointerNote = null;
+    let activePointerId = null;
 
     let score = 0;
     let combo = 0;
@@ -637,16 +809,159 @@
     let songStartTime = 0;
     let animationId = null;
     let scheduledNotes = [];
-    let currentSongIndex = 0;
-    let currentNoteStartTime = 0;
     let songPaused = false;
     let pausedAt = 0;
     let totalPausedTime = 0;
     let blockingNote = null;
 
+    let demoRunning = false;
+    let demoTimers = [];
+    let autoPlayMode = false;
+
     const NOTE_HEIGHT = 38;
-    const FALL_TIME = 4200;
-    const HIT_WINDOW = 230;
+    const SONG_LEAD_IN = 1200;
+    let fallTime = 5200;
+
+    const SOUND_PRESETS = {
+      classic: { label: "Classic Piano", wave: "triangle", attack: 0.006, release: 0.48, detune: 0, secondOsc: true },
+      soft:    { label: "Soft",          wave: "sine",     attack: 0.025, release: 0.25, detune: 0, secondOsc: false },
+      warm:    { label: "Warm",          wave: "triangle", attack: 0.020, release: 0.35, detune: -2, secondOsc: true },
+      retro:   { label: "Retro",         wave: "square",   attack: 0.008, release: 0.16, detune: 0, secondOsc: false },
+      bell:    { label: "Bell",          wave: "sine",     attack: 0.004, release: 0.90, detune: 8, secondOsc: true },
+      organ:   { label: "Organ",         wave: "sawtooth", attack: 0.035, release: 0.35, detune: -4, secondOsc: true }
+    };
+
+    const MOZART_TURKISH = buildRhythmMelody([
+      // Mozart — Turkish March / Rondo alla Turca
+      // גרסת Easy Practice לפי התחושה של התווים בתמונה:
+      // תווים קצרים, דיליי קטן בין כל תו, ועצירות ברורות בין תיבות/משפטים.
+      // עדיין Melody Practice בלבד, בלי אקורדים של יד שמאל.
+
+      // Bar 1 — פתיחה מוכרת יותר, עם מרווחים כדי שלא יידחסו
+      ["B4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.10],
+      ["G#4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.20],
+
+      ["C5", 0.55], ["REST", 0.10],
+      ["D5", 0.55], ["REST", 0.10],
+      ["C5", 0.55], ["REST", 0.10],
+      ["B4", 0.55], ["REST", 0.30],
+
+      // Bar 2
+      ["C5", 0.55], ["REST", 0.10],
+      ["E5", 0.55], ["REST", 0.10],
+      ["F5", 0.55], ["REST", 0.10],
+      ["E5", 0.55], ["REST", 0.10],
+      ["D#5", 0.55], ["REST", 0.10],
+      ["E5", 1.10], ["REST", 0.80],
+
+      // Bar 3 — תשובה
+      ["B4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.10],
+      ["G#4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.20],
+
+      ["B4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.10],
+      ["G#4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.30],
+
+      // Bar 4
+      ["C5", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.10],
+      ["C5", 0.55], ["REST", 0.10],
+      ["B4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.10],
+      ["G#4", 0.55], ["REST", 0.10],
+      ["A4", 1.30], ["REST", 1.00],
+
+      // Bar 5 — עלייה, איטית וברורה יותר
+      ["E5", 0.55], ["REST", 0.10],
+      ["F5", 0.55], ["REST", 0.10],
+      ["G5", 0.55], ["REST", 0.10],
+      ["A5", 0.90], ["REST", 0.20],
+      ["G#5", 0.45], ["REST", 0.10],
+      ["A5", 0.55], ["REST", 0.10],
+      ["B5", 0.55], ["REST", 0.10],
+      ["A5", 1.20], ["REST", 0.80],
+
+      // Bar 6 — ירידה
+      ["G5", 0.55], ["REST", 0.10],
+      ["F5", 0.55], ["REST", 0.10],
+      ["E5", 0.55], ["REST", 0.10],
+      ["D5", 0.55], ["REST", 0.20],
+      ["C5", 0.55], ["REST", 0.10],
+      ["D5", 0.55], ["REST", 0.10],
+      ["E5", 1.20], ["REST", 0.90],
+
+      // Bar 7 — חזרה קצרה לסיום תרגול
+      ["B4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.10],
+      ["G#4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.20],
+      ["C5", 0.55], ["REST", 0.10],
+      ["B4", 0.55], ["REST", 0.10],
+      ["A4", 0.55], ["REST", 0.10],
+      ["G#4", 0.55], ["REST", 0.10],
+      ["A4", 1.60]
+    ], 82, 0.72);
+
+    // תרגיל מקורי בסגנון עדין, לא תווים רשמיים של Blackbird.
+    function buildRhythmMelody(items, bpm = 120, noteFill = 0.88, start = 0) {
+      const beatMs = 60000 / bpm;
+      let time = start;
+      const result = [];
+
+      items.forEach(item => {
+        const [note, beats = 1] = Array.isArray(item) ? item : [item, 1];
+        const duration = beats * beatMs;
+
+        if (note !== "REST") {
+          result.push({
+            note,
+            t: Math.round(time),
+            len: Math.round(duration * noteFill)
+          });
+        }
+
+        time += duration;
+      });
+
+      return result;
+    }
+
+    function buildMelody(notes, start = 0, step = 220, len = 220) {
+      return notes.map((note, index) => ({
+        note,
+        t: start + index * step,
+        len
+      }));
+    }
+
+    const BELLA_CIAO = buildRhythmMelody([
+      // Bella Ciao — תזמון איטי וברור יותר ללחיצות, עם נשימות בין המשפטים.
+      ["E4", 0.75], ["A4", 0.75], ["B4", 0.5], ["C5", 0.5], ["A4", 1.5], ["REST", 0.75],
+      ["E4", 0.75], ["A4", 0.75], ["B4", 0.5], ["C5", 0.5], ["A4", 1.5], ["REST", 0.75],
+
+      ["E4", 0.5], ["A4", 0.5], ["B4", 0.5], ["C5", 0.5],
+      ["B4", 0.5], ["A4", 0.5], ["C5", 0.75], ["B4", 0.75], ["A4", 1.25], ["REST", 0.75],
+
+      ["E5", 0.5], ["E5", 0.5], ["E5", 0.75], ["D5", 0.5], ["E5", 0.5], ["F5", 1.25], ["REST", 0.25],
+      ["F5", 0.5], ["F5", 0.5], ["E5", 0.75], ["D5", 0.5], ["F5", 0.5], ["E5", 1.25], ["REST", 0.25],
+      ["E5", 0.5], ["D5", 0.5], ["C5", 0.5], ["B4", 0.5], ["E5", 1.25], ["REST", 0.5],
+      ["C5", 0.75], ["B4", 0.75], ["A4", 1.75]
+    ], 92, 0.82);
+
+    const BLACKBIRD_STYLE = buildRhythmMelody([
+      // תרגיל מקורי בסגנון Fingerpicking — איטי ונוח יותר ללימוד.
+      ["G4", 0.75], ["B4", 0.5], ["D5", 0.75], ["B4", 0.75], ["REST", 0.5],
+      ["A4", 0.75], ["C5", 0.5], ["E5", 0.75], ["C5", 0.75], ["REST", 0.5],
+      ["G4", 0.75], ["B4", 0.5], ["D5", 0.75], ["G5", 1.0], ["REST", 0.5],
+      ["F#5", 0.75], ["E5", 0.75], ["D5", 0.75], ["B4", 1.0], ["REST", 0.5],
+      ["C5", 0.75], ["E5", 0.5], ["G5", 0.75], ["E5", 0.75], ["REST", 0.5],
+      ["D5", 0.75], ["B4", 0.75], ["G4", 1.75]
+    ], 78, 0.84);
 
     function midiToFrequency(midi) {
       return 440 * Math.pow(2, (midi - 69) / 12);
@@ -663,7 +978,6 @@
       return noteName.includes("#");
     }
 
-    // פסנתר אמיתי כולל 88 קלידים: A0 = MIDI 21 עד C8 = MIDI 108
     const ALL_NOTES = Array.from({ length: 88 }, (_, index) => {
       const midi = index + 21;
       const note = midiToNoteName(midi);
@@ -676,64 +990,30 @@
       };
     });
 
-    const MOZART_SONG = [
-      // Mozart — Turkish March / Rondo Alla Turca
-      // גרסה מותאמת למשחק קצב: תווים מוכרים, קצב זורם, בלי אקורדים מסובכים מדי בשלב הזה.
-      { note: "B4", t: 800, len: 180 },
-      { note: "A4", t: 1050, len: 180 },
-      { note: "G#4", t: 1300, len: 180 },
-      { note: "A4", t: 1550, len: 180 },
-      { note: "C5", t: 1800, len: 220 },
-      { note: "D5", t: 2050, len: 220 },
-      { note: "C5", t: 2300, len: 180 },
-      { note: "B4", t: 2550, len: 180 },
-      { note: "A4", t: 2800, len: 260 },
+    function getSelectedSong() {
+      if (songSelect.value === "blackbird_style") return BLACKBIRD_STYLE;
+      if (songSelect.value === "bella_ciao") return BELLA_CIAO;
+      return MOZART_TURKISH;
+    }
 
-      { note: "B4", t: 3300, len: 180 },
-      { note: "A4", t: 3550, len: 180 },
-      { note: "G#4", t: 3800, len: 180 },
-      { note: "A4", t: 4050, len: 180 },
-      { note: "E5", t: 4300, len: 220 },
-      { note: "F5", t: 4550, len: 220 },
-      { note: "E5", t: 4800, len: 180 },
-      { note: "D5", t: 5050, len: 180 },
-      { note: "C5", t: 5300, len: 260 },
+    function getSelectedSongStartNote() {
+      if (songSelect.value === "blackbird_style") return "G4";
+      if (songSelect.value === "bella_ciao") return "E4";
+      return "G4";
+    }
 
-      { note: "A4", t: 5800, len: 160 },
-      { note: "C5", t: 6000, len: 160 },
-      { note: "E5", t: 6200, len: 160 },
-      { note: "A5", t: 6400, len: 220 },
-      { note: "G#5", t: 6700, len: 160 },
-      { note: "A5", t: 6900, len: 160 },
-      { note: "B5", t: 7100, len: 160 },
-      { note: "A5", t: 7300, len: 260 },
+    function prepareSongForFallingNotes(song) {
+      // זמן t של כל תו הוא זמן ההגעה לציר.
+      // מוסיפים fallTime + Lead-in כדי שהתווים לא יופיעו צפופים בתחילת המסך.
+      return song.map(item => ({
+        ...item,
+        t: item.t + fallTime + SONG_LEAD_IN
+      }));
+    }
 
-      { note: "E5", t: 7800, len: 160 },
-      { note: "F5", t: 8000, len: 160 },
-      { note: "E5", t: 8200, len: 160 },
-      { note: "D5", t: 8400, len: 160 },
-      { note: "C5", t: 8600, len: 160 },
-      { note: "B4", t: 8800, len: 160 },
-      { note: "A4", t: 9000, len: 300 },
-
-      { note: "B4", t: 9500, len: 160 },
-      { note: "C5", t: 9700, len: 160 },
-      { note: "D5", t: 9900, len: 160 },
-      { note: "E5", t: 10100, len: 160 },
-      { note: "F5", t: 10300, len: 160 },
-      { note: "E5", t: 10500, len: 160 },
-      { note: "D5", t: 10700, len: 160 },
-      { note: "C5", t: 10900, len: 260 },
-
-      { note: "A4", t: 11400, len: 180 },
-      { note: "A4", t: 11650, len: 180 },
-      { note: "B4", t: 11900, len: 180 },
-      { note: "C5", t: 12150, len: 180 },
-      { note: "D5", t: 12400, len: 180 },
-      { note: "E5", t: 12650, len: 180 },
-      { note: "C5", t: 12900, len: 180 },
-      { note: "A4", t: 13150, len: 380 }
-    ];
+    function getSoundPreset() {
+      return SOUND_PRESETS[currentSound] || SOUND_PRESETS.classic;
+    }
 
     function getAudioContext() {
       if (!audioContext) {
@@ -745,26 +1025,49 @@
       return audioContext;
     }
 
+    function createOscillatorVoice(ctx, noteData, gainNode, volume, isShort = false, duration = 0.45) {
+      const preset = getSoundPreset();
+      const osc = ctx.createOscillator();
+      osc.type = preset.wave;
+      osc.frequency.setValueAtTime(noteData.freq, ctx.currentTime);
+      osc.detune.setValueAtTime(preset.detune, ctx.currentTime);
+      osc.connect(gainNode);
+      osc.start();
+
+      if (isShort) {
+        osc.stop(ctx.currentTime + duration + preset.release + 0.04);
+      }
+
+      return osc;
+    }
+
     function startSustainedNote(noteData) {
       const noteKey = noteData.note;
       if (activeOscillators.has(noteKey)) return;
 
       const ctx = getAudioContext();
-      const oscillator = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      oscillator.type = waveType;
-      oscillator.frequency.setValueAtTime(noteData.freq, ctx.currentTime);
-
+      const preset = getSoundPreset();
+      const mainGain = ctx.createGain();
       const volume = Math.max(Number(volumeEl.value), 0.0001);
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.025);
 
-      oscillator.connect(gain);
-      gain.connect(ctx.destination);
-      oscillator.start();
+      mainGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      mainGain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + preset.attack);
+      mainGain.connect(ctx.destination);
 
-      activeOscillators.set(noteKey, { oscillator, gain });
+      const voices = [];
+      voices.push(createOscillatorVoice(ctx, noteData, mainGain, volume));
+
+      if (preset.secondOsc) {
+        const osc2 = ctx.createOscillator();
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(noteData.freq * 2, ctx.currentTime);
+        osc2.detune.setValueAtTime(-8, ctx.currentTime);
+        osc2.connect(mainGain);
+        osc2.start();
+        voices.push(osc2);
+      }
+
+      activeOscillators.set(noteKey, { voices, gain: mainGain });
       activeNoteEl.textContent = noteKey;
       pressVisual(noteKey);
       checkRhythmHit(noteKey);
@@ -775,12 +1078,17 @@
       if (!active) return;
 
       const ctx = getAudioContext();
+      const preset = getSoundPreset();
       active.gain.gain.cancelScheduledValues(ctx.currentTime);
       active.gain.gain.setValueAtTime(Math.max(active.gain.gain.value, 0.0001), ctx.currentTime);
-      active.gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
-      active.oscillator.stop(ctx.currentTime + 0.14);
+      active.gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + preset.release);
+      active.voices.forEach(osc => osc.stop(ctx.currentTime + preset.release + 0.03));
       activeOscillators.delete(noteName);
       releaseVisual(noteName);
+    }
+
+    function stopAllNotes() {
+      Array.from(activeOscillators.keys()).forEach(stopSustainedNote);
     }
 
     function playShortNote(noteName, duration = 0.45) {
@@ -788,20 +1096,26 @@
       if (!noteData) return;
 
       const ctx = getAudioContext();
-      const oscillator = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      oscillator.type = waveType;
-      oscillator.frequency.setValueAtTime(noteData.freq, ctx.currentTime);
+      const preset = getSoundPreset();
+      const mainGain = ctx.createGain();
       const volume = Math.max(Number(volumeEl.value), 0.0001);
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
 
-      oscillator.connect(gain);
-      gain.connect(ctx.destination);
-      oscillator.start();
-      oscillator.stop(ctx.currentTime + duration + 0.05);
+      mainGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      mainGain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + preset.attack);
+      mainGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration + preset.release);
+      mainGain.connect(ctx.destination);
+
+      createOscillatorVoice(ctx, noteData, mainGain, volume, true, duration);
+
+      if (preset.secondOsc) {
+        const osc2 = ctx.createOscillator();
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(noteData.freq * 2, ctx.currentTime);
+        osc2.detune.setValueAtTime(-8, ctx.currentTime);
+        osc2.connect(mainGain);
+        osc2.start();
+        osc2.stop(ctx.currentTime + duration + preset.release + 0.04);
+      }
     }
 
     function setVisibleRange(startIndex) {
@@ -820,28 +1134,45 @@
     function renderVisiblePiano() {
       whiteKeysEl.innerHTML = "";
       blackLayerEl.innerHTML = "";
+      noteToKeyboardKey.clear();
+      keyboardKeyToNote.clear();
 
       const whiteNotes = visibleNotes.filter(n => n.type === "white");
       whiteKeysEl.style.gridTemplateColumns = `repeat(${whiteNotes.length}, 1fr)`;
 
       whiteNotes.forEach((noteData, whiteIndex) => {
+        const key = WHITE_KEYBOARD_MAP[whiteIndex] || "";
+        if (key) {
+          noteToKeyboardKey.set(noteData.note, key);
+          keyboardKeyToNote.set(key, noteData);
+        }
+
         const btn = document.createElement("button");
         btn.className = "key white-key";
         btn.dataset.note = noteData.note;
-        btn.innerHTML = `<small>${getKeyboardKeyForVisible(noteData.index).toUpperCase()}</small>${noteData.note}`;
+        btn.innerHTML = `<small>${key.toUpperCase()}</small>${noteData.note}`;
         addPointerEvents(btn, noteData);
         whiteKeysEl.appendChild(btn);
       });
 
+      let blackIndex = 0;
       visibleNotes.forEach(noteData => {
         if (noteData.type !== "black") return;
-        const left = getNoteLeftPercent(noteData.index);
+
+        const key = BLACK_KEYBOARD_MAP[blackIndex] || "";
+        blackIndex++;
+
+        if (key) {
+          noteToKeyboardKey.set(noteData.note, key);
+          keyboardKeyToNote.set(key, noteData);
+        }
+
         const btn = document.createElement("button");
         btn.className = "key black-key";
         btn.dataset.note = noteData.note;
-        btn.style.left = `${left}%`;
+        btn.style.left = `${getNoteLeftPercent(noteData.index)}%`;
         btn.style.width = `${Math.max(4.3, 74 / visibleCount)}%`;
-        btn.innerHTML = `<small>${getKeyboardKeyForVisible(noteData.index).toUpperCase()}</small>${noteData.note}`;
+        btn.innerHTML = `<small>${key.toUpperCase()}</small>${noteData.note}`;
         addPointerEvents(btn, noteData);
         blackLayerEl.appendChild(btn);
       });
@@ -851,44 +1182,58 @@
       btn.addEventListener("pointerdown", event => {
         event.preventDefault();
         isPointerSliding = true;
-        currentPointerNote = noteData.note;
-        btn.setPointerCapture(event.pointerId);
-        startSustainedNote(noteData);
-      });
-
-      btn.addEventListener("pointerenter", event => {
-        // מאפשר החלקה עם העכבר/אצבע על הקלידים בזמן לחיצה ארוכה.
-        // כשנכנסים לקליד חדש — הקליד הקודם נעצר והחדש מתחיל לנגן.
-        if (!isPointerSliding) return;
-        if (currentPointerNote === noteData.note) return;
-        if (currentPointerNote) stopSustainedNote(currentPointerNote);
+        activePointerId = event.pointerId;
         currentPointerNote = noteData.note;
         startSustainedNote(noteData);
-      });
-
-      btn.addEventListener("pointerup", event => {
-        event.preventDefault();
-        isPointerSliding = false;
-        stopSustainedNote(noteData.note);
-        currentPointerNote = null;
-      });
-
-      btn.addEventListener("pointercancel", () => {
-        isPointerSliding = false;
-        if (currentPointerNote) stopSustainedNote(currentPointerNote);
-        currentPointerNote = null;
-      });
-
-      btn.addEventListener("lostpointercapture", () => {
-        isPointerSliding = false;
-        if (currentPointerNote) stopSustainedNote(currentPointerNote);
-        currentPointerNote = null;
       });
     }
 
-    function getKeyboardKeyForVisible(globalIndex) {
-      const localIndex = globalIndex - visibleStartIndex;
-      return KEYBOARD_MAP[localIndex] || "";
+    document.addEventListener("pointermove", event => {
+      if (!isPointerSliding || event.pointerId !== activePointerId) return;
+      event.preventDefault();
+
+      const el = document.elementFromPoint(event.clientX, event.clientY);
+      const keyEl = el?.closest?.(".key");
+      if (!keyEl) return;
+
+      const nextNoteName = keyEl.dataset.note;
+      if (!nextNoteName || nextNoteName === currentPointerNote) return;
+
+      const nextNote = ALL_NOTES.find(n => n.note === nextNoteName);
+      if (!nextNote) return;
+
+      if (currentPointerNote) stopSustainedNote(currentPointerNote);
+      currentPointerNote = nextNoteName;
+      startSustainedNote(nextNote);
+    }, { passive: false });
+
+    document.addEventListener("pointerup", event => {
+      if (!isPointerSliding || event.pointerId !== activePointerId) return;
+      event.preventDefault();
+      if (currentPointerNote) stopSustainedNote(currentPointerNote);
+      isPointerSliding = false;
+      currentPointerNote = null;
+      activePointerId = null;
+    }, { passive: false });
+
+    document.addEventListener("pointercancel", event => {
+      if (event.pointerId !== activePointerId) return;
+      if (currentPointerNote) stopSustainedNote(currentPointerNote);
+      isPointerSliding = false;
+      currentPointerNote = null;
+      activePointerId = null;
+    });
+
+    window.addEventListener("blur", () => {
+      stopAllNotes();
+      stopDemo();
+      isPointerSliding = false;
+      currentPointerNote = null;
+      activePointerId = null;
+    });
+
+    function getKeyboardKeyForNoteName(noteName) {
+      return noteToKeyboardKey.get(noteName) || "";
     }
 
     function getNoteLeftPercent(globalIndex) {
@@ -960,18 +1305,18 @@
       toastEl.style.borderColor = kind === "bad" ? "rgba(251, 113, 133, 0.45)" : "rgba(52, 211, 153, 0.45)";
       toastEl.classList.add("show");
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 650);
+      showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 850);
     }
 
     function startSong() {
       stopSong(false);
+      stopDemo();
       resetStats();
 
-      // קפיצה אוטומטית לאזור של Turkish March כדי שהתווים יהיו מול המשתמש
-      const songStartIndex = ALL_NOTES.findIndex(n => n.note === "G#4");
+      const songStartIndex = ALL_NOTES.findIndex(n => n.note === getSelectedSongStartNote());
       setVisibleRange(Math.max(0, songStartIndex - 4));
 
-      scheduledNotes = MOZART_SONG.map(item => ({
+      scheduledNotes = prepareSongForFallingNotes(getSelectedSong()).map(item => ({
         ...item,
         hit: false,
         element: null
@@ -979,8 +1324,6 @@
 
       songRunning = true;
       songStartTime = performance.now();
-      currentSongIndex = 0;
-      currentNoteStartTime = performance.now();
       songPaused = false;
       pausedAt = 0;
       totalPausedTime = 0;
@@ -992,12 +1335,48 @@
     function stopSong(showMessage = true) {
       songRunning = false;
       songPaused = false;
+      autoPlayMode = false;
       blockingNote = null;
       if (animationId) cancelAnimationFrame(animationId);
       animationId = null;
       scheduledNotes = [];
       document.querySelectorAll(".fall-note").forEach(el => el.remove());
       if (showMessage) showToast("השיר נעצר", "bad");
+    }
+
+    function stopDemo() {
+      demoTimers.forEach(timer => clearTimeout(timer));
+      demoTimers = [];
+      demoRunning = false;
+      document.querySelectorAll(".key.pressed").forEach(el => el.classList.remove("pressed"));
+    }
+
+    function playSongDemo() {
+      stopSong(false);
+      stopDemo();
+      stopAllNotes();
+      resetStats();
+
+      const songStartIndex = ALL_NOTES.findIndex(n => n.note === getSelectedSongStartNote());
+      setVisibleRange(Math.max(0, songStartIndex - 4));
+
+      scheduledNotes = prepareSongForFallingNotes(getSelectedSong()).map(item => ({
+        ...item,
+        hit: false,
+        element: null
+      }));
+
+      songRunning = true;
+      demoRunning = true;
+      autoPlayMode = true;
+      songPaused = false;
+      pausedAt = 0;
+      totalPausedTime = 0;
+      blockingNote = null;
+      songStartTime = performance.now();
+      animationId = requestAnimationFrame(songLoop);
+
+      showToast("דוגמה מתנגנת עם תווים נופלים", "good");
     }
 
     function songLoop(now) {
@@ -1017,7 +1396,7 @@
       scheduledNotes.forEach(item => {
         if (item.hit) return;
 
-        const appearTime = item.t - FALL_TIME;
+        const appearTime = item.t - fallTime;
         const noteElapsed = elapsed - appearTime;
 
         if (noteElapsed < 0) return;
@@ -1027,24 +1406,31 @@
           gameStage.appendChild(item.element);
         }
 
-        const yProgress = Math.min(noteElapsed / FALL_TIME, 1);
+        const yProgress = Math.min(noteElapsed / fallTime, 1);
         const y = startY + yProgress * (finalY - startY);
         item.element.style.transform = `translateY(${y}px)`;
 
         if (yProgress >= 1 && !blockingNote) {
           item.element.classList.add("waiting");
-          blockingNote = item;
-          songPaused = true;
-          pausedAt = performance.now();
-          showToast("לחץ על התו הנכון כדי להמשיך", "good");
+
+          if (autoPlayMode) {
+            finishRhythmNote(item, "Auto", 100, false);
+          } else {
+            blockingNote = item;
+            songPaused = true;
+            pausedAt = performance.now();
+            showToast("לחץ על התו הנכון כדי להמשיך", "good");
+          }
         }
       });
 
       const lastNoteTime = Math.max(...scheduledNotes.map(n => n.t));
       const allDone = scheduledNotes.every(n => n.hit);
 
-      if (allDone || elapsed > lastNoteTime + FALL_TIME + 6000) {
+      if (allDone || elapsed > lastNoteTime + fallTime + 6000) {
         songRunning = false;
+        demoRunning = false;
+        autoPlayMode = false;
         showToast(`סיום! ניקוד: ${score}`, "good");
         return;
       }
@@ -1055,9 +1441,10 @@
     function createFallingNote(item) {
       const el = document.createElement("div");
       el.className = "fall-note";
+
       const noteIndex = ALL_NOTES.findIndex(n => n.note === item.note);
-      const keyboardKey = getKeyboardKeyForVisible(noteIndex);
-      el.textContent = keyboardKey ? keyboardKey.toUpperCase() : "—";
+      const keyboardKey = getKeyboardKeyForNoteName(item.note);
+      el.textContent = keyboardKey ? keyboardKey.toUpperCase() : "?";
       el.title = item.note;
 
       const localIndex = noteIndex - visibleStartIndex;
@@ -1072,12 +1459,13 @@
       return el;
     }
 
+    function getNextUnhitNote() {
+      return scheduledNotes.find(item => !item.hit) || null;
+    }
+
     function checkRhythmHit(noteName) {
       if (!songRunning) return;
 
-      const elapsed = performance.now() - songStartTime - totalPausedTime;
-
-      // אם תו כבר הגיע לציר ועצר את כולם — חייבים ללחוץ עליו כדי להמשיך.
       if (blockingNote) {
         if (blockingNote.note !== noteName) {
           showToast("תו לא נכון", "bad");
@@ -1092,39 +1480,33 @@
         return;
       }
 
-      // אם לחצת על התו הנכון לפני שהוא הגיע לקו — מקבלים את זה,
-      // מציגים "מוקדם מדי", וממשיכים לתו הבא במקום להעניש.
-      const earlyMatch = scheduledNotes.find(item => {
-        return !item.hit && item.note === noteName && elapsed < item.t;
-      });
+      const nextNote = getNextUnhitNote();
+      if (!nextNote) return;
 
-      if (earlyMatch) {
-        finishRhythmNote(earlyMatch, "מוקדם מדי — ממשיכים", 70 + combo * 6);
+      if (nextNote.note !== noteName) {
+        showToast("תו לא נכון", "bad");
         return;
       }
 
-      // אם במקרה הלחיצה הייתה בדיוק אחרי הזמן אבל לפני שהמערכת הספיקה לעצור — גם מקבלים.
-      const readyMatch = scheduledNotes.find(item => {
-        return !item.hit && item.note === noteName && elapsed >= item.t;
-      });
-
-      if (readyMatch) {
-        finishRhythmNote(readyMatch, "נכון!", 100 + combo * 10);
-        return;
+      const elapsed = performance.now() - songStartTime - totalPausedTime;
+      if (elapsed < nextNote.t) {
+        finishRhythmNote(nextNote, "מוקדם מדי — ממשיכים", 70 + combo * 6);
+      } else {
+        finishRhythmNote(nextNote, "נכון!", 100 + combo * 10);
       }
-
-      showToast("תו לא נכון", "bad");
     }
 
-    function finishRhythmNote(item, message, points) {
+    function finishRhythmNote(item, message, points, showMessage = true) {
       item.hit = true;
       hits++;
       combo++;
       score += points;
 
       updateStats();
-      showToast(message, message.includes("מוקדם") ? "bad" : "good");
-      playShortNote(item.note, Math.max(0.25, item.len / 1000));
+      if (showMessage) {
+        showToast(message, message.includes("מוקדם") ? "bad" : "good");
+      }
+      playShortNote(item.note, Math.max(0.20, item.len / 1000));
 
       if (item.element) {
         item.element.classList.add("hit");
@@ -1136,10 +1518,7 @@
       const key = event.key.toLowerCase();
       if (pressedKeyboard.has(key)) return;
 
-      const localIndex = KEYBOARD_MAP.indexOf(key);
-      if (localIndex === -1) return;
-
-      const noteData = visibleNotes[localIndex];
+      const noteData = keyboardKeyToNote.get(key);
       if (!noteData) return;
 
       pressedKeyboard.add(key);
@@ -1150,10 +1529,7 @@
       const key = event.key.toLowerCase();
       pressedKeyboard.delete(key);
 
-      const localIndex = KEYBOARD_MAP.indexOf(key);
-      if (localIndex === -1) return;
-
-      const noteData = visibleNotes[localIndex];
+      const noteData = keyboardKeyToNote.get(key);
       if (noteData) stopSustainedNote(noteData.note);
     });
 
@@ -1165,7 +1541,32 @@
       setVisibleRange(visibleStartIndex);
     });
 
-    miniMapEl.addEventListener("click", event => {
+    songSelect.addEventListener("change", () => {
+      stopSong(false);
+      stopDemo();
+      const songStartIndex = ALL_NOTES.findIndex(n => n.note === getSelectedSongStartNote());
+      setVisibleRange(Math.max(0, songStartIndex - 4));
+      showToast("השיר עודכן", "good");
+    });
+
+    fallSpeedEl.addEventListener("input", () => {
+      fallTime = Number(fallSpeedEl.value);
+      updateFallSpeedLabel();
+    });
+
+    function updateFallSpeedLabel() {
+      const value = Number(fallSpeedEl.value);
+      if (value <= 4200) {
+        fallSpeedLabel.textContent = "מהירות נפילה: מהירה";
+      } else if (value <= 6000) {
+        fallSpeedLabel.textContent = "מהירות נפילה: קלה";
+      } else {
+        fallSpeedLabel.textContent = "מהירות נפילה: איטית מאוד";
+      }
+    }
+
+    miniMapEl.addEventListener("pointerdown", event => {
+      event.preventDefault();
       const rect = miniMapEl.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const percent = x / rect.width;
@@ -1173,25 +1574,36 @@
       setVisibleRange(targetStart);
     });
 
-    waveButtons.forEach(button => {
+    soundButtons.forEach(button => {
       button.addEventListener("click", () => {
-        waveButtons.forEach(btn => btn.classList.remove("active"));
+        soundButtons.forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
-        waveType = button.dataset.wave;
+        currentSound = button.dataset.sound;
+        showToast(`סוג צליל: ${getSoundPreset().label}`, "good");
       });
     });
 
     startSongBtn.addEventListener("click", startSong);
-    stopSongBtn.addEventListener("click", () => stopSong(true));
+    demoSongBtn.addEventListener("click", playSongDemo);
+    stopSongBtn.addEventListener("click", () => {
+      stopSong(true);
+      stopDemo();
+      stopAllNotes();
+    });
+
     resetBtn.addEventListener("click", () => {
       stopSong(false);
+      stopDemo();
+      stopAllNotes();
       resetStats();
       activeNoteEl.textContent = "—";
-      showToast("אופס הכל — נקי", "good");
+      showToast("איפוס בוצע", "good");
     });
 
     renderMiniMap();
-    setVisibleRange(24);
+    const initialSongIndex = ALL_NOTES.findIndex(n => n.note === getSelectedSongStartNote());
+    setVisibleRange(Math.max(0, initialSongIndex - 4));
+    updateFallSpeedLabel();
     resetStats();
   </script>
 </body>
