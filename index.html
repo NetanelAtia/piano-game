@@ -134,6 +134,39 @@
       margin-bottom: 16px;
     }
 
+    .top-controls {
+      grid-template-columns: 0.8fr 1.4fr 1fr 1fr;
+    }
+
+    .practice-dock {
+      display: grid;
+      grid-template-columns: 1.15fr 1.85fr 1fr;
+      gap: 14px;
+      margin: 0 0 12px;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(2, 6, 23, 0.34);
+      border: 1px solid rgba(125, 211, 252, 0.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .practice-dock .control-box {
+      padding: 13px;
+      background: rgba(15, 23, 42, 0.62);
+    }
+
+    .training-actions {
+      justify-content: center;
+    }
+
+    .training-actions button {
+      min-width: 92px;
+    }
+
+    .song-box select {
+      min-height: 43px;
+    }
+
     .control-box {
       background: rgba(2, 6, 23, 0.42);
       border: 1px solid rgba(148, 163, 184, 0.15);
@@ -514,6 +547,17 @@
       line-height: 1.7;
     }
 
+    @media (max-width: 1100px) {
+      .top-controls,
+      .practice-dock {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .training-box {
+        grid-column: 1 / -1;
+      }
+    }
+
     @media (max-width: 1000px) {
       body {
         padding: 10px;
@@ -740,6 +784,37 @@
         font-size: 10px;
       }
 
+      .top-controls {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 5px;
+        margin: 0 0 5px;
+      }
+
+      .practice-dock {
+        display: grid;
+        grid-template-columns: 1.1fr 1.9fr 0.9fr;
+        gap: 5px;
+        margin: 0 0 5px;
+        padding: 5px;
+        border-radius: 12px;
+      }
+
+      .practice-dock .control-box {
+        padding: 5px;
+        border-radius: 12px;
+      }
+
+      .training-actions {
+        gap: 4px;
+      }
+
+      .training-actions button {
+        min-width: 0;
+        padding: 6px 7px;
+        font-size: 10px;
+      }
+
       .feedback-toast {
         top: 6px;
         padding: 8px 12px;
@@ -775,7 +850,7 @@
       </div>
     </section>
 
-    <section class="controls">
+    <section class="controls top-controls">
       <div class="control-box">
         <label for="volume">ווליום</label>
         <input id="volume" type="range" min="0" max="1" step="0.01" value="0.45" />
@@ -794,25 +869,6 @@
       </div>
 
       <div class="control-box">
-        <span class="label">מצב אימון</span>
-        <div class="btn-row">
-          <button id="startSongBtn">התחל שיר</button>
-          <button id="demoSongBtn">שמע דוגמה</button>
-          <button id="stopSongBtn">עצור</button>
-          <button id="resetBtn">איפוס</button>
-          <button id="bgMusicBtn">מנגינת רקע: כבוי</button>
-        </div>
-      </div>
-
-      <div class="control-box">
-        <label for="fallSpeed">מהירות ירידת התווים</label>
-        <input id="fallSpeed" type="range" min="1000" max="5000" step="100" value="1900" />
-        <span class="label" id="fallSpeedLabel">מהירות נפילה: קלה</span>
-      </div>
-    </section>
-
-    <section class="controls">
-      <div class="control-box">
         <label for="octaveRange">בחירת אזור פסנתר</label>
         <input id="octaveRange" type="range" min="0" max="40" step="1" value="24" />
       </div>
@@ -826,8 +882,20 @@
           <option value="35" selected>35 קלידים — מתקדם</option>
         </select>
       </div>
+    </section>
 
-      <div class="control-box">
+    <section class="mini-map-shell">
+      <div class="mini-title">
+        <span>מפת פסנתר מלאה — A0 עד C8</span>
+        <span id="rangeLabel">—</span>
+      </div>
+      <div class="mini-map" id="miniMap">
+        <div class="viewport-box" id="viewportBox"></div>
+      </div>
+    </section>
+
+    <section class="practice-dock" aria-label="מצב אימון ושיר נבחר">
+      <div class="control-box song-box">
         <span class="label">שיר נבחר</span>
         <select id="songSelect">
           <option value="happy_birthday">Happy Birthday — פזמון מלא</option>
@@ -842,15 +910,22 @@
           <option value="we_wish">We Wish You a Merry Christmas — פזמון מלא</option>
         </select>
       </div>
-    </section>
 
-    <section class="mini-map-shell">
-      <div class="mini-title">
-        <span>מפת פסנתר מלאה — A0 עד C8</span>
-        <span id="rangeLabel">—</span>
+      <div class="control-box training-box">
+        <span class="label">מצב אימון</span>
+        <div class="btn-row training-actions">
+          <button id="startSongBtn">התחל שיר</button>
+          <button id="demoSongBtn">שמע דוגמה</button>
+          <button id="stopSongBtn">עצור</button>
+          <button id="resetBtn">איפוס</button>
+          <button id="bgMusicBtn">מנגינת רקע: כבוי</button>
+        </div>
       </div>
-      <div class="mini-map" id="miniMap">
-        <div class="viewport-box" id="viewportBox"></div>
+
+      <div class="control-box speed-box">
+        <label for="fallSpeed">מהירות ירידת התווים</label>
+        <input id="fallSpeed" type="range" min="1000" max="5000" step="100" value="1900" />
+        <span class="label" id="fallSpeedLabel">מהירות נפילה: קלה</span>
       </div>
     </section>
 
