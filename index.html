@@ -1922,14 +1922,91 @@
       return Boolean(getKeyboardKeyForNoteName(noteName));
     }
 
-    function ensureNoteVisibleAndMapped(noteName) {
+    function findBestStartForSingleNote(noteName) {
+      const noteData = ALL_NOTES.find(n => n.note === noteName);
+      if (!noteData) return visibleStartIndex;
+
+      const maxStart = ALL_NOTES.length - visibleCount;
+      let bestStart = visibleStartIndex;
+      let bestScore = Number.POSITIVE_INFINITY;
+
+      for (let start = 0; start <= maxStart; start++) {
+        if (noteData.index < start || noteData.index >= start + visibleCount) continue;
+
+        const key = getKeyboardKeyForNoteInRange(noteData.index, start, visibleCount);
+        if (!key) continue;
+
+        const local = noteData.index - start;
+        const center = visibleCount * 0.42;
+        const edgePenalty = (local < 2 || local > visibleCount - 3) ? 80 : 0;
+        const movementPenalty = Math.abs(start - visibleStartIndex) * 0.35;
+        const score = Math.abs(local - center) + edgePenalty + movementPenalty;
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestStart = start;
+        }
+      }
+
+      return bestStart;
+    }
+
+    function refreshFallingNotesLayout() {
+      if (!scheduledNotes.length) return;
+
+      scheduledNotes.forEach(item => {
+        if (!item.element || item.hit) return;
+
+        const noteIndex = ALL_NOTES.findIndex(n => n.note === item.note);
+        const keyboardKey = getKeyboardKeyForNoteName(item.note);
+        const localIndex = noteIndex - visibleStartIndex;
+
+        if (!keyboardKey || localIndex < 0 || localIndex >= visibleCount) {
+          item.element.style.display = "none";
+          return;
+        }
+
+        const metrics = getNoteLaneMetrics(item.note);
+        item.element.style.display = "flex";
+        item.element.textContent = keyboardKey.toUpperCase();
+        item.element.title = item.note;
+        item.element.dataset.note = item.note;
+        item.element.style.left = `${metrics.left}%`;
+        item.element.style.width = `${metrics.width}%`;
+      });
+    }
+
+    function autoSlideRangeToNote(noteName) {
       const noteData = ALL_NOTES.find(n => n.note === noteName);
       if (!noteData) return false;
 
-      // לא מזיזים טווח באמצע שיר/דוגמה. זה היה גורם לבועה להציג אות אחת
-      // אבל המקלדת כבר הייתה ממופה לתו אחר — ולכן D למשל לא הגיב נכון.
       const inRange = noteData.index >= visibleStartIndex && noteData.index < visibleStartIndex + visibleCount;
-      return inRange && Boolean(getKeyboardKeyForNoteName(noteName));
+      const hasKeyboardKey = Boolean(getKeyboardKeyForNoteName(noteName));
+
+      if (inRange && hasKeyboardKey) return true;
+
+      const targetStart = findBestStartForSingleNote(noteName);
+      if (targetStart !== visibleStartIndex) {
+        setVisibleRange(targetStart);
+        refreshFallingNotesLayout();
+      }
+
+      return Boolean(getKeyboardKeyForNoteName(noteName));
+    }
+
+    function ensureNoteVisibleAndMapped(noteName) {
+      return autoSlideRangeToNote(noteName);
+    }
+
+    function getUpcomingAutoRangeNote(elapsed) {
+      const pending = scheduledNotes.filter(item => !item.hit);
+      if (!pending.length) return null;
+
+      const waiting = pending.find(item => elapsed >= item.t - HIT_WINDOW_MS);
+      if (waiting) return waiting;
+
+      const visibleOrNext = pending.find(item => elapsed >= item.t - fallTime - 350);
+      return visibleOrNext || pending[0];
     }
 
     function getNoteLeftPercent(globalIndex) {
@@ -2187,6 +2264,11 @@
       }
 
       const elapsed = now - songStartTime - totalPausedTime;
+      const autoRangeNote = getUpcomingAutoRangeNote(elapsed);
+      if (autoRangeNote) {
+        autoSlideRangeToNote(autoRangeNote.note);
+      }
+
       const stageHeight = gameStage.clientHeight;
       const hitLineY = stageHeight - 38;
       const finalY = hitLineY - NOTE_HEIGHT / 2;
