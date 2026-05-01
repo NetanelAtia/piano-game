@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Professional Rhythm Piano</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    :root {
+      --bg0: #050816;
+      --bg1: #08111f;
+      --card: rgba(15, 23, 42, 0.86);
+      --line: rgba(148, 163, 184, 0.22);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary2: #a78bfa;
+      --good: #34d399;
+      --bad: #fb7185;
+      --warn: #fbbf24;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.22), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.24), transparent 36%),
+        linear-gradient(135deg, var(--bg0), var(--bg1) 48%, #020617);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 22px;
+      overflow-x: hidden;
+    }
+
+    .app {
+      width: min(1280px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      box-shadow: 0 26px 90px rgba(0, 0, 0, 0.48);
+      backdrop-filter: blur(18px);
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .hero {
+      padding: 22px;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(167, 139, 250, 0.10)),
+        rgba(2, 6, 23, 0.34);
+      border: 1px solid rgba(125, 211, 252, 0.2);
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 760px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.38);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      min-height: 92px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .stat strong {
+      font-size: 27px;
+      color: var(--primary);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.15fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .control-box {
+      background: rgba(2, 6, 23, 0.42);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .control-box label,
+    .control-box .label {
+      display: block;
+      color: #cbd5e1;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, select {
+      border: 0;
+      outline: 0;
+      border-radius: 14px;
+      padding: 11px 15px;
+      background: rgba(148, 163, 184, 0.14);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.17s ease, background 0.17s ease, box-shadow 0.17s ease;
+    }
+
+    select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: rgba(56, 189, 248, 0.22);
+      box-shadow: 0 10px 24px rgba(56, 189, 248, 0.16);
+    }
+
+    button.active {
+      background: linear-gradient(135deg, #0284c7, #7c3aed);
+      box-shadow: 0 10px 28px rgba(124, 58, 237, 0.25);
+    }
+
+    .mini-map-shell {
+      margin-bottom: 16px;
+      padding: 14px;
+      border-radius: 22px;
+      background: rgba(2, 6, 23, 0.34);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .mini-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #cbd5e1;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .mini-map {
+      position: relative;
+      direction: ltr;
+      height: 54px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+    }
+
+    .mini-key {
+      position: absolute;
+      bottom: 0;
+      border-left: 1px solid rgba(15, 23, 42, 0.14);
+    }
+
+    .mini-key.white {
+      height: 100%;
+      background: linear-gradient(180deg, #f8fafc, #cbd5e1);
+      z-index: 1;
+    }
+
+    .mini-key.black {
+      height: 62%;
+      background: linear-gradient(180deg, #111827, #020617);
+      z-index: 2;
+      border-radius: 0 0 5px 5px;
+    }
+
+    .viewport-box {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      background: rgba(56, 189, 248, 0.13);
+      z-index: 5;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+      pointer-events: none;
+    }
+
+    .game-stage {
+      position: relative;
+      height: 330px;
+      direction: ltr;
+      border-radius: 26px 26px 10px 10px;
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.96)),
+        radial-gradient(circle at center, rgba(56, 189, 248, 0.14), transparent 50%);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+
+    .lane-lines {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      pointer-events: none;
+    }
+
+    .lane-line {
+      border-left: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .hit-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 38px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--primary), var(--primary2), transparent);
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.55);
+      z-index: 4;
+    }
+
+    .hit-zone-label {
+      position: absolute;
+      bottom: 48px;
+      right: 18px;
+      color: #cbd5e1;
+      font-size: 12px;
+      z-index: 5;
+      direction: rtl;
+    }
+
+    .fall-note {
+      position: absolute;
+      top: -48px;
+      height: 38px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #38bdf8, #a78bfa);
+      box-shadow: 0 10px 26px rgba(56, 189, 248, 0.32);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      font-weight: 950;
+      color: white;
+      z-index: 3;
+      border: 1px solid rgba(255,255,255,0.22);
+    }
+
+    .fall-note.waiting {
+      outline: 2px solid rgba(251, 191, 36, 0.95);
+      box-shadow: 0 0 24px rgba(251, 191, 36, 0.42), 0 10px 26px rgba(56, 189, 248, 0.25);
+    }
+
+    .fall-note.hit {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      animation: pop 220ms ease forwards;
+    }
+
+    .fall-note.miss {
+      background: linear-gradient(135deg, #ef4444, #fb7185);
+      animation: fadeOut 260ms ease forwards;
+    }
+
+    @keyframes pop {
+      to { transform: scale(1.25); opacity: 0; }
+    }
+
+    @keyframes fadeOut {
+      to { transform: translateY(18px); opacity: 0; }
+    }
+
+    .piano-shell {
+      background: linear-gradient(180deg, #0f172a, #020617);
+      border-radius: 0 0 26px 26px;
+      padding: 18px 14px 16px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-top: 0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 60px rgba(0,0,0,0.34);
+      margin-bottom: 16px;
+    }
+
+    .piano-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 14px;
+      padding: 0 8px;
+      gap: 12px;
+    }
+
+    .piano {
+      position: relative;
+      height: 270px;
+      direction: ltr;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .white-keys {
+      display: grid;
+      height: 100%;
+      gap: 3px;
+    }
+
+    .key {
+      position: relative;
+      border: 0;
+      outline: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 16px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .white-key {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 64%, #dbeafe 100%);
+      color: #1e293b;
+      border-radius: 0 0 16px 16px;
+      border: 1px solid rgba(15, 23, 42, 0.18);
+      box-shadow: inset 0 -7px 12px rgba(15, 23, 42, 0.08), 0 8px 20px rgba(0,0,0,0.15);
+      height: 100%;
+      font-size: 13px;
+    }
+
+    .black-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .black-key {
+      position: absolute;
+      top: 0;
+      height: 58%;
+      background: linear-gradient(180deg, #111827, #020617 72%, #000);
+      color: #e2e8f0;
+      border-radius: 0 0 13px 13px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 -8px 12px rgba(255,255,255,0.03), 0 12px 24px rgba(0,0,0,0.45);
+      z-index: 2;
+      pointer-events: auto;
+      padding-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .key small {
+      display: block;
+      position: absolute;
+      bottom: 40px;
+      font-size: 11px;
+      opacity: 0.58;
+      font-weight: 800;
+    }
+
+    .white-key.pressed {
+      transform: translateY(4px);
+      background: linear-gradient(180deg, #bae6fd, #7dd3fc);
+      box-shadow: inset 0 8px 14px rgba(14, 116, 144, 0.28);
+    }
+
+    .black-key.pressed {
+      transform: translateY(4px);
+      background: linear-gradient(180deg, #334155, #0284c7);
+      box-shadow: inset 0 8px 14px rgba(0, 0, 0, 0.36);
+    }
+
+    .feedback-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      padding: 13px 18px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.38);
+      color: white;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .feedback-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(6px);
+    }
+
+    .footer-help {
+      padding: 16px;
+      background: rgba(2, 6, 23, 0.34);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 18px;
+      color: #cbd5e1;
+      line-height: 1.85;
+      font-size: 14px;
+    }
+
+    .footer-help strong {
+      color: var(--primary);
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 14px;
+      }
+
+      .app {
+        padding: 16px;
+        border-radius: 24px;
+      }
+
+      .top-bar,
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .game-stage {
+        height: 280px;
+      }
+
+      .piano {
+        height: 235px;
+      }
+
+      .piano-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="top-bar">
+      <div class="hero">
+        <h1>פסנתר קצב מקצועי</h1>
+        <p>
+          פסנתר מלא של 88 קלידים, בחירת אזור נגינה כמו באפליקציות אמיתיות, מצב אימון עם תווים נופלים,
+          ולחיצה ארוכה שממשיכה להשמיע צליל עד שמשחררים.
+        </p>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>תו פעיל</span><strong id="activeNote">—</strong></div>
+        <div class="stat"><span>ניקוד</span><strong id="scoreEl">0</strong></div>
+        <div class="stat"><span>קומבו</span><strong id="comboEl">0</strong></div>
+        <div class="stat"><span>דיוק</span><strong id="accuracyEl">100%</strong></div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="control-box">
+        <label for="volume">ווליום</label>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="0.45" />
+      </div>
+
+      <div class="control-box">
+        <span class="label">סוג צליל</span>
+        <div class="btn-row">
+          <button class="wave-btn active" data-wave="sine">Soft</button>
+          <button class="wave-btn" data-wave="triangle">Warm</button>
+          <button class="wave-btn" data-wave="square">Retro</button>
+        </div>
+      </div>
+
+      <div class="control-box">
+        <span class="label">מצב אימון</span>
+        <div class="btn-row">
+          <button id="startSongBtn">התחל שיר</button>
+          <button id="stopSongBtn">עצור</button>
+          <button id="resetBtn">איפוס</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="control-box">
+        <label for="octaveRange">בחירת אזור פסנתר</label>
+        <input id="octaveRange" type="range" min="0" max="40" step="1" value="24" />
+      </div>
+
+      <div class="control-box">
+        <label for="visibleKeysSelect">כמה קלידים להציג</label>
+        <select id="visibleKeysSelect">
+          <option value="14">14 קלידים — נוח מאוד</option>
+          <option value="21">21 קלידים — מומלץ</option>
+          <option value="28">28 קלידים — רחב</option>
+          <option value="35" selected>35 קלידים — מתקדם</option>
+        </select>
+      </div>
+
+      <div class="control-box">
+        <span class="label">שיר נבחר — Mozart Turkish March</span>
+        <select id="songSelect">
+          <option value="turkish">Mozart — Turkish March</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="mini-map-shell">
+      <div class="mini-title">
+        <span>מפת פסנתר מלאה — A0 עד C8</span>
+        <span id="rangeLabel">—</span>
+      </div>
+      <div class="mini-map" id="miniMap">
+        <div class="viewport-box" id="viewportBox"></div>
+      </div>
+    </section>
+
+    <section class="game-stage" id="gameStage">
+      <div class="lane-lines" id="laneLines"></div>
+      <div class="hit-line"></div>
+      <div class="hit-zone-label">לחץ כשהתו מגיע לקו</div>
+    </section>
+
+    <section class="piano-shell">
+      <div class="piano-header">
+        <span id="pianoRangeText">Professional 88-Key Web Piano</span>
+        <span>מקלדת מחשב: A S D F G H J K L ; ' Q R I וגם W E T Y U</span>
+      </div>
+
+      <div class="piano" id="piano">
+        <div class="white-keys" id="whiteKeys"></div>
+        <div class="black-layer" id="blackLayer"></div>
+      </div>
+    </section>
+
+    <section class="footer-help">
+      <strong>איך מנגנים?</strong>
+      אפשר ללחוץ עם העכבר/טאץ׳ על הקלידים. לחיצה ארוכה ממשיכה את הצליל. במצב השיר, תווים נופלים מלמעלה וצריך ללחוץ על הקליד הנכון בדיוק כשהתו מגיע לקו הזוהר.
+    </section>
+  </main>
+
+  <div class="feedback-toast" id="toast">Perfect!</div>
+
+  <script>
+    const WHITE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
+    const BLACK_NAMES = ["C#", "D#", "F#", "G#", "A#"];
+    const KEYBOARD_MAP = ["a", "w", "s", "e", "d", "f", "t", "g", "y", "h", "u", "j", "k", "o", "l", "p", ";", "'", "q", "r", "i", "[", "]", "z", "x", "c", "v", "b", "n", "m"];
+
+    const whiteKeysEl = document.getElementById("whiteKeys");
+    const blackLayerEl = document.getElementById("blackLayer");
+    const miniMapEl = document.getElementById("miniMap");
+    const viewportBoxEl = document.getElementById("viewportBox");
+    const octaveRangeEl = document.getElementById("octaveRange");
+    const visibleKeysSelect = document.getElementById("visibleKeysSelect");
+    const rangeLabel = document.getElementById("rangeLabel");
+    const pianoRangeText = document.getElementById("pianoRangeText");
+    const gameStage = document.getElementById("gameStage");
+    const laneLines = document.getElementById("laneLines");
+    const activeNoteEl = document.getElementById("activeNote");
+    const scoreEl = document.getElementById("scoreEl");
+    const comboEl = document.getElementById("comboEl");
+    const accuracyEl = document.getElementById("accuracyEl");
+    const volumeEl = document.getElementById("volume");
+    const toastEl = document.getElementById("toast");
+    const startSongBtn = document.getElementById("startSongBtn");
+    const stopSongBtn = document.getElementById("stopSongBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const waveButtons = document.querySelectorAll(".wave-btn");
+
+    let audioContext;
+    let waveType = "sine";
+    let visibleStartIndex = 24;
+    let visibleCount = 35;
+    let visibleNotes = [];
+    let activeOscillators = new Map();
+    let pressedKeyboard = new Set();
+    let isPointerSliding = false;
+    let currentPointerNote = null;
+
+    let score = 0;
+    let combo = 0;
+    let hits = 0;
+    let misses = 0;
+
+    let songRunning = false;
+    let songStartTime = 0;
+    let animationId = null;
+    let scheduledNotes = [];
+    let currentSongIndex = 0;
+    let currentNoteStartTime = 0;
+    let songPaused = false;
+    let pausedAt = 0;
+    let totalPausedTime = 0;
+    let blockingNote = null;
+
+    const NOTE_HEIGHT = 38;
+    const FALL_TIME = 4200;
+    const HIT_WINDOW = 230;
+
+    function midiToFrequency(midi) {
+      return 440 * Math.pow(2, (midi - 69) / 12);
+    }
+
+    function midiToNoteName(midi) {
+      const names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+      const name = names[midi % 12];
+      const octave = Math.floor(midi / 12) - 1;
+      return `${name}${octave}`;
+    }
+
+    function isBlackNote(noteName) {
+      return noteName.includes("#");
+    }
+
+    // פסנתר אמיתי כולל 88 קלידים: A0 = MIDI 21 עד C8 = MIDI 108
+    const ALL_NOTES = Array.from({ length: 88 }, (_, index) => {
+      const midi = index + 21;
+      const note = midiToNoteName(midi);
+      return {
+        index,
+        midi,
+        note,
+        freq: midiToFrequency(midi),
+        type: isBlackNote(note) ? "black" : "white"
+      };
+    });
+
+    const MOZART_SONG = [
+      // Mozart — Turkish March / Rondo Alla Turca
+      // גרסה מותאמת למשחק קצב: תווים מוכרים, קצב זורם, בלי אקורדים מסובכים מדי בשלב הזה.
+      { note: "B4", t: 800, len: 180 },
+      { note: "A4", t: 1050, len: 180 },
+      { note: "G#4", t: 1300, len: 180 },
+      { note: "A4", t: 1550, len: 180 },
+      { note: "C5", t: 1800, len: 220 },
+      { note: "D5", t: 2050, len: 220 },
+      { note: "C5", t: 2300, len: 180 },
+      { note: "B4", t: 2550, len: 180 },
+      { note: "A4", t: 2800, len: 260 },
+
+      { note: "B4", t: 3300, len: 180 },
+      { note: "A4", t: 3550, len: 180 },
+      { note: "G#4", t: 3800, len: 180 },
+      { note: "A4", t: 4050, len: 180 },
+      { note: "E5", t: 4300, len: 220 },
+      { note: "F5", t: 4550, len: 220 },
+      { note: "E5", t: 4800, len: 180 },
+      { note: "D5", t: 5050, len: 180 },
+      { note: "C5", t: 5300, len: 260 },
+
+      { note: "A4", t: 5800, len: 160 },
+      { note: "C5", t: 6000, len: 160 },
+      { note: "E5", t: 6200, len: 160 },
+      { note: "A5", t: 6400, len: 220 },
+      { note: "G#5", t: 6700, len: 160 },
+      { note: "A5", t: 6900, len: 160 },
+      { note: "B5", t: 7100, len: 160 },
+      { note: "A5", t: 7300, len: 260 },
+
+      { note: "E5", t: 7800, len: 160 },
+      { note: "F5", t: 8000, len: 160 },
+      { note: "E5", t: 8200, len: 160 },
+      { note: "D5", t: 8400, len: 160 },
+      { note: "C5", t: 8600, len: 160 },
+      { note: "B4", t: 8800, len: 160 },
+      { note: "A4", t: 9000, len: 300 },
+
+      { note: "B4", t: 9500, len: 160 },
+      { note: "C5", t: 9700, len: 160 },
+      { note: "D5", t: 9900, len: 160 },
+      { note: "E5", t: 10100, len: 160 },
+      { note: "F5", t: 10300, len: 160 },
+      { note: "E5", t: 10500, len: 160 },
+      { note: "D5", t: 10700, len: 160 },
+      { note: "C5", t: 10900, len: 260 },
+
+      { note: "A4", t: 11400, len: 180 },
+      { note: "A4", t: 11650, len: 180 },
+      { note: "B4", t: 11900, len: 180 },
+      { note: "C5", t: 12150, len: 180 },
+      { note: "D5", t: 12400, len: 180 },
+      { note: "E5", t: 12650, len: 180 },
+      { note: "C5", t: 12900, len: 180 },
+      { note: "A4", t: 13150, len: 380 }
+    ];
+
+    function getAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+      return audioContext;
+    }
+
+    function startSustainedNote(noteData) {
+      const noteKey = noteData.note;
+      if (activeOscillators.has(noteKey)) return;
+
+      const ctx = getAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      oscillator.type = waveType;
+      oscillator.frequency.setValueAtTime(noteData.freq, ctx.currentTime);
+
+      const volume = Math.max(Number(volumeEl.value), 0.0001);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.025);
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start();
+
+      activeOscillators.set(noteKey, { oscillator, gain });
+      activeNoteEl.textContent = noteKey;
+      pressVisual(noteKey);
+      checkRhythmHit(noteKey);
+    }
+
+    function stopSustainedNote(noteName) {
+      const active = activeOscillators.get(noteName);
+      if (!active) return;
+
+      const ctx = getAudioContext();
+      active.gain.gain.cancelScheduledValues(ctx.currentTime);
+      active.gain.gain.setValueAtTime(Math.max(active.gain.gain.value, 0.0001), ctx.currentTime);
+      active.gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+      active.oscillator.stop(ctx.currentTime + 0.14);
+      activeOscillators.delete(noteName);
+      releaseVisual(noteName);
+    }
+
+    function playShortNote(noteName, duration = 0.45) {
+      const noteData = ALL_NOTES.find(n => n.note === noteName);
+      if (!noteData) return;
+
+      const ctx = getAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      oscillator.type = waveType;
+      oscillator.frequency.setValueAtTime(noteData.freq, ctx.currentTime);
+      const volume = Math.max(Number(volumeEl.value), 0.0001);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + duration + 0.05);
+    }
+
+    function setVisibleRange(startIndex) {
+      visibleCount = Number(visibleKeysSelect.value);
+      const maxStart = ALL_NOTES.length - visibleCount;
+      visibleStartIndex = Math.max(0, Math.min(startIndex, maxStart));
+      octaveRangeEl.max = maxStart;
+      octaveRangeEl.value = visibleStartIndex;
+      visibleNotes = ALL_NOTES.slice(visibleStartIndex, visibleStartIndex + visibleCount);
+      renderVisiblePiano();
+      renderLaneLines();
+      updateMiniViewport();
+      updateRangeTexts();
+    }
+
+    function renderVisiblePiano() {
+      whiteKeysEl.innerHTML = "";
+      blackLayerEl.innerHTML = "";
+
+      const whiteNotes = visibleNotes.filter(n => n.type === "white");
+      whiteKeysEl.style.gridTemplateColumns = `repeat(${whiteNotes.length}, 1fr)`;
+
+      whiteNotes.forEach((noteData, whiteIndex) => {
+        const btn = document.createElement("button");
+        btn.className = "key white-key";
+        btn.dataset.note = noteData.note;
+        btn.innerHTML = `<small>${getKeyboardKeyForVisible(noteData.index).toUpperCase()}</small>${noteData.note}`;
+        addPointerEvents(btn, noteData);
+        whiteKeysEl.appendChild(btn);
+      });
+
+      visibleNotes.forEach(noteData => {
+        if (noteData.type !== "black") return;
+        const left = getNoteLeftPercent(noteData.index);
+        const btn = document.createElement("button");
+        btn.className = "key black-key";
+        btn.dataset.note = noteData.note;
+        btn.style.left = `${left}%`;
+        btn.style.width = `${Math.max(4.3, 74 / visibleCount)}%`;
+        btn.innerHTML = `<small>${getKeyboardKeyForVisible(noteData.index).toUpperCase()}</small>${noteData.note}`;
+        addPointerEvents(btn, noteData);
+        blackLayerEl.appendChild(btn);
+      });
+    }
+
+    function addPointerEvents(btn, noteData) {
+      btn.addEventListener("pointerdown", event => {
+        event.preventDefault();
+        isPointerSliding = true;
+        currentPointerNote = noteData.note;
+        btn.setPointerCapture(event.pointerId);
+        startSustainedNote(noteData);
+      });
+
+      btn.addEventListener("pointerenter", event => {
+        // מאפשר החלקה עם העכבר/אצבע על הקלידים בזמן לחיצה ארוכה.
+        // כשנכנסים לקליד חדש — הקליד הקודם נעצר והחדש מתחיל לנגן.
+        if (!isPointerSliding) return;
+        if (currentPointerNote === noteData.note) return;
+        if (currentPointerNote) stopSustainedNote(currentPointerNote);
+        currentPointerNote = noteData.note;
+        startSustainedNote(noteData);
+      });
+
+      btn.addEventListener("pointerup", event => {
+        event.preventDefault();
+        isPointerSliding = false;
+        stopSustainedNote(noteData.note);
+        currentPointerNote = null;
+      });
+
+      btn.addEventListener("pointercancel", () => {
+        isPointerSliding = false;
+        if (currentPointerNote) stopSustainedNote(currentPointerNote);
+        currentPointerNote = null;
+      });
+
+      btn.addEventListener("lostpointercapture", () => {
+        isPointerSliding = false;
+        if (currentPointerNote) stopSustainedNote(currentPointerNote);
+        currentPointerNote = null;
+      });
+    }
+
+    function getKeyboardKeyForVisible(globalIndex) {
+      const localIndex = globalIndex - visibleStartIndex;
+      return KEYBOARD_MAP[localIndex] || "";
+    }
+
+    function getNoteLeftPercent(globalIndex) {
+      const local = globalIndex - visibleStartIndex;
+      return (local / visibleCount) * 100;
+    }
+
+    function pressVisual(noteName) {
+      const el = document.querySelector(`[data-note="${noteName}"]`);
+      if (el) el.classList.add("pressed");
+    }
+
+    function releaseVisual(noteName) {
+      const el = document.querySelector(`[data-note="${noteName}"]`);
+      if (el) el.classList.remove("pressed");
+    }
+
+    function renderMiniMap() {
+      miniMapEl.querySelectorAll(".mini-key").forEach(el => el.remove());
+      ALL_NOTES.forEach(noteData => {
+        const el = document.createElement("div");
+        el.className = `mini-key ${noteData.type}`;
+        el.style.left = `${(noteData.index / ALL_NOTES.length) * 100}%`;
+        el.style.width = noteData.type === "black" ? "0.8%" : "1.15%";
+        miniMapEl.appendChild(el);
+      });
+    }
+
+    function updateMiniViewport() {
+      viewportBoxEl.style.left = `${(visibleStartIndex / ALL_NOTES.length) * 100}%`;
+      viewportBoxEl.style.width = `${(visibleCount / ALL_NOTES.length) * 100}%`;
+    }
+
+    function updateRangeTexts() {
+      const first = visibleNotes[0]?.note || "—";
+      const last = visibleNotes[visibleNotes.length - 1]?.note || "—";
+      rangeLabel.textContent = `${first} → ${last}`;
+      pianoRangeText.textContent = `אזור נגינה פעיל: ${first} → ${last}`;
+    }
+
+    function renderLaneLines() {
+      laneLines.innerHTML = "";
+      laneLines.style.gridTemplateColumns = `repeat(${visibleCount}, 1fr)`;
+      for (let i = 0; i < visibleCount; i++) {
+        const line = document.createElement("div");
+        line.className = "lane-line";
+        laneLines.appendChild(line);
+      }
+    }
+
+    function resetStats() {
+      score = 0;
+      combo = 0;
+      hits = 0;
+      misses = 0;
+      updateStats();
+    }
+
+    function updateStats() {
+      scoreEl.textContent = score;
+      comboEl.textContent = combo;
+      const total = hits + misses;
+      const accuracy = total === 0 ? 100 : Math.round((hits / total) * 100);
+      accuracyEl.textContent = `${accuracy}%`;
+    }
+
+    function showToast(text, kind = "good") {
+      toastEl.textContent = text;
+      toastEl.style.borderColor = kind === "bad" ? "rgba(251, 113, 133, 0.45)" : "rgba(52, 211, 153, 0.45)";
+      toastEl.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toastEl.classList.remove("show"), 650);
+    }
+
+    function startSong() {
+      stopSong(false);
+      resetStats();
+
+      // קפיצה אוטומטית לאזור של Turkish March כדי שהתווים יהיו מול המשתמש
+      const songStartIndex = ALL_NOTES.findIndex(n => n.note === "G#4");
+      setVisibleRange(Math.max(0, songStartIndex - 4));
+
+      scheduledNotes = MOZART_SONG.map(item => ({
+        ...item,
+        hit: false,
+        element: null
+      }));
+
+      songRunning = true;
+      songStartTime = performance.now();
+      currentSongIndex = 0;
+      currentNoteStartTime = performance.now();
+      songPaused = false;
+      pausedAt = 0;
+      totalPausedTime = 0;
+      blockingNote = null;
+      animationId = requestAnimationFrame(songLoop);
+      showToast("השיר התחיל — בהצלחה!", "good");
+    }
+
+    function stopSong(showMessage = true) {
+      songRunning = false;
+      songPaused = false;
+      blockingNote = null;
+      if (animationId) cancelAnimationFrame(animationId);
+      animationId = null;
+      scheduledNotes = [];
+      document.querySelectorAll(".fall-note").forEach(el => el.remove());
+      if (showMessage) showToast("השיר נעצר", "bad");
+    }
+
+    function songLoop(now) {
+      if (!songRunning) return;
+
+      if (songPaused) {
+        animationId = requestAnimationFrame(songLoop);
+        return;
+      }
+
+      const elapsed = now - songStartTime - totalPausedTime;
+      const stageHeight = gameStage.clientHeight;
+      const hitLineY = stageHeight - 38;
+      const finalY = hitLineY - NOTE_HEIGHT / 2;
+      const startY = -NOTE_HEIGHT;
+
+      scheduledNotes.forEach(item => {
+        if (item.hit) return;
+
+        const appearTime = item.t - FALL_TIME;
+        const noteElapsed = elapsed - appearTime;
+
+        if (noteElapsed < 0) return;
+
+        if (!item.element) {
+          item.element = createFallingNote(item);
+          gameStage.appendChild(item.element);
+        }
+
+        const yProgress = Math.min(noteElapsed / FALL_TIME, 1);
+        const y = startY + yProgress * (finalY - startY);
+        item.element.style.transform = `translateY(${y}px)`;
+
+        if (yProgress >= 1 && !blockingNote) {
+          item.element.classList.add("waiting");
+          blockingNote = item;
+          songPaused = true;
+          pausedAt = performance.now();
+          showToast("לחץ על התו הנכון כדי להמשיך", "good");
+        }
+      });
+
+      const lastNoteTime = Math.max(...scheduledNotes.map(n => n.t));
+      const allDone = scheduledNotes.every(n => n.hit);
+
+      if (allDone || elapsed > lastNoteTime + FALL_TIME + 6000) {
+        songRunning = false;
+        showToast(`סיום! ניקוד: ${score}`, "good");
+        return;
+      }
+
+      animationId = requestAnimationFrame(songLoop);
+    }
+
+    function createFallingNote(item) {
+      const el = document.createElement("div");
+      el.className = "fall-note";
+      const noteIndex = ALL_NOTES.findIndex(n => n.note === item.note);
+      const keyboardKey = getKeyboardKeyForVisible(noteIndex);
+      el.textContent = keyboardKey ? keyboardKey.toUpperCase() : "—";
+      el.title = item.note;
+
+      const localIndex = noteIndex - visibleStartIndex;
+      const width = 100 / visibleCount;
+      el.style.left = `${localIndex * width + 0.8}%`;
+      el.style.width = `${Math.max(width - 1.4, 3.2)}%`;
+
+      if (localIndex < 0 || localIndex >= visibleCount) {
+        el.style.display = "none";
+      }
+
+      return el;
+    }
+
+    function checkRhythmHit(noteName) {
+      if (!songRunning) return;
+
+      const elapsed = performance.now() - songStartTime - totalPausedTime;
+
+      // אם תו כבר הגיע לציר ועצר את כולם — חייבים ללחוץ עליו כדי להמשיך.
+      if (blockingNote) {
+        if (blockingNote.note !== noteName) {
+          showToast("תו לא נכון", "bad");
+          return;
+        }
+
+        finishRhythmNote(blockingNote, "נכון!", 100 + combo * 10);
+        totalPausedTime += performance.now() - pausedAt;
+        blockingNote = null;
+        songPaused = false;
+        pausedAt = 0;
+        return;
+      }
+
+      // אם לחצת על התו הנכון לפני שהוא הגיע לקו — מקבלים את זה,
+      // מציגים "מוקדם מדי", וממשיכים לתו הבא במקום להעניש.
+      const earlyMatch = scheduledNotes.find(item => {
+        return !item.hit && item.note === noteName && elapsed < item.t;
+      });
+
+      if (earlyMatch) {
+        finishRhythmNote(earlyMatch, "מוקדם מדי — ממשיכים", 70 + combo * 6);
+        return;
+      }
+
+      // אם במקרה הלחיצה הייתה בדיוק אחרי הזמן אבל לפני שהמערכת הספיקה לעצור — גם מקבלים.
+      const readyMatch = scheduledNotes.find(item => {
+        return !item.hit && item.note === noteName && elapsed >= item.t;
+      });
+
+      if (readyMatch) {
+        finishRhythmNote(readyMatch, "נכון!", 100 + combo * 10);
+        return;
+      }
+
+      showToast("תו לא נכון", "bad");
+    }
+
+    function finishRhythmNote(item, message, points) {
+      item.hit = true;
+      hits++;
+      combo++;
+      score += points;
+
+      updateStats();
+      showToast(message, message.includes("מוקדם") ? "bad" : "good");
+      playShortNote(item.note, Math.max(0.25, item.len / 1000));
+
+      if (item.element) {
+        item.element.classList.add("hit");
+        setTimeout(() => item.element?.remove(), 220);
+      }
+    }
+
+    document.addEventListener("keydown", event => {
+      const key = event.key.toLowerCase();
+      if (pressedKeyboard.has(key)) return;
+
+      const localIndex = KEYBOARD_MAP.indexOf(key);
+      if (localIndex === -1) return;
+
+      const noteData = visibleNotes[localIndex];
+      if (!noteData) return;
+
+      pressedKeyboard.add(key);
+      startSustainedNote(noteData);
+    });
+
+    document.addEventListener("keyup", event => {
+      const key = event.key.toLowerCase();
+      pressedKeyboard.delete(key);
+
+      const localIndex = KEYBOARD_MAP.indexOf(key);
+      if (localIndex === -1) return;
+
+      const noteData = visibleNotes[localIndex];
+      if (noteData) stopSustainedNote(noteData.note);
+    });
+
+    octaveRangeEl.addEventListener("input", () => {
+      setVisibleRange(Number(octaveRangeEl.value));
+    });
+
+    visibleKeysSelect.addEventListener("change", () => {
+      setVisibleRange(visibleStartIndex);
+    });
+
+    miniMapEl.addEventListener("click", event => {
+      const rect = miniMapEl.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const percent = x / rect.width;
+      const targetStart = Math.round(percent * ALL_NOTES.length - visibleCount / 2);
+      setVisibleRange(targetStart);
+    });
+
+    waveButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        waveButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        waveType = button.dataset.wave;
+      });
+    });
+
+    startSongBtn.addEventListener("click", startSong);
+    stopSongBtn.addEventListener("click", () => stopSong(true));
+    resetBtn.addEventListener("click", () => {
+      stopSong(false);
+      resetStats();
+      activeNoteEl.textContent = "—";
+      showToast("אופס הכל — נקי", "good");
+    });
+
+    renderMiniMap();
+    setVisibleRange(24);
+    resetStats();
+  </script>
+</body>
+</html>
