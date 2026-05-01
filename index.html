@@ -432,6 +432,18 @@
       box-shadow: inset 0 8px 14px rgba(0, 0, 0, 0.36);
     }
 
+    .white-key.target-key {
+      background: linear-gradient(180deg, #fef3c7, #facc15 55%, #f59e0b);
+      box-shadow: 0 0 28px rgba(250, 204, 21, 0.65), inset 0 -7px 12px rgba(120, 53, 15, 0.18);
+      border-color: rgba(250, 204, 21, 0.95);
+    }
+
+    .black-key.target-key {
+      background: linear-gradient(180deg, #fde68a, #f59e0b 65%, #92400e);
+      box-shadow: 0 0 28px rgba(250, 204, 21, 0.72), 0 12px 24px rgba(0,0,0,0.45);
+      border-color: rgba(250, 204, 21, 0.95);
+    }
+
     .feedback-toast {
       position: fixed;
       top: 20px;
@@ -906,6 +918,7 @@
     let pausedAt = 0;
     let totalPausedTime = 0;
     let blockingNote = null;
+    let highlightedTargetNote = null;
 
     let demoRunning = false;
     let demoTimers = [];
@@ -1274,6 +1287,7 @@
     function addPointerEvents(btn, noteData) {
       btn.addEventListener("pointerdown", event => {
         event.preventDefault();
+        window.getSelection?.().removeAllRanges();
         isPointerSliding = true;
         activePointerId = event.pointerId;
         currentPointerNote = noteData.note;
@@ -1320,9 +1334,22 @@
     window.addEventListener("blur", () => {
       stopAllNotes();
       stopDemo();
+      clearTargetHighlight();
       isPointerSliding = false;
       currentPointerNote = null;
       activePointerId = null;
+    });
+
+    document.addEventListener("selectstart", event => {
+      if (event.target.closest?.(".key, .piano, .game-stage, .app")) {
+        event.preventDefault();
+      }
+    });
+
+    document.addEventListener("contextmenu", event => {
+      if (event.target.closest?.(".key, .piano, .game-stage")) {
+        event.preventDefault();
+      }
     });
 
     function getKeyboardKeyForNoteName(noteName) {
@@ -1342,6 +1369,40 @@
     function releaseVisual(noteName) {
       const el = document.querySelector(`[data-note="${noteName}"]`);
       if (el) el.classList.remove("pressed");
+    }
+
+    function clearTargetHighlight() {
+      document.querySelectorAll(".target-key").forEach(el => el.classList.remove("target-key"));
+      highlightedTargetNote = null;
+    }
+
+    function highlightTargetNote(noteName) {
+      if (!noteName || highlightedTargetNote === noteName) return;
+      clearTargetHighlight();
+      const el = document.querySelector(`[data-note="${noteName}"]`);
+      if (el) {
+        el.classList.add("target-key");
+        highlightedTargetNote = noteName;
+      }
+    }
+
+    function updateTargetHighlight() {
+      if (!songRunning) {
+        clearTargetHighlight();
+        return;
+      }
+
+      if (blockingNote) {
+        highlightTargetNote(blockingNote.note);
+        return;
+      }
+
+      const nextNote = getNextUnhitNote();
+      if (nextNote) {
+        highlightTargetNote(nextNote.note);
+      } else {
+        clearTargetHighlight();
+      }
     }
 
     function renderMiniMap() {
@@ -1422,6 +1483,7 @@
       totalPausedTime = 0;
       blockingNote = null;
       animationId = requestAnimationFrame(songLoop);
+      updateTargetHighlight();
       showToast("השיר התחיל — בהצלחה!", "good");
     }
 
@@ -1430,6 +1492,7 @@
       songPaused = false;
       autoPlayMode = false;
       blockingNote = null;
+      clearTargetHighlight();
       if (animationId) cancelAnimationFrame(animationId);
       animationId = null;
       scheduledNotes = [];
@@ -1468,6 +1531,7 @@
       blockingNote = null;
       songStartTime = performance.now();
       animationId = requestAnimationFrame(songLoop);
+      updateTargetHighlight();
 
       showToast("דוגמה מתנגנת עם תווים נופלים", "good");
     }
@@ -1505,11 +1569,13 @@
 
         if (yProgress >= 1 && !blockingNote) {
           item.element.classList.add("waiting");
+          highlightTargetNote(item.note);
 
           if (autoPlayMode) {
             finishRhythmNote(item, "Auto", 100, false);
           } else {
             blockingNote = item;
+            highlightTargetNote(item.note);
             songPaused = true;
             pausedAt = performance.now();
             showToast("לחץ על התו הנכון כדי להמשיך", "good");
@@ -1524,6 +1590,7 @@
         songRunning = false;
         demoRunning = false;
         autoPlayMode = false;
+        clearTargetHighlight();
         showToast(`סיום! ניקוד: ${score}`, "good");
         return;
       }
@@ -1570,6 +1637,7 @@
         blockingNote = null;
         songPaused = false;
         pausedAt = 0;
+        updateTargetHighlight();
         return;
       }
 
@@ -1605,6 +1673,11 @@
         item.element.classList.add("hit");
         setTimeout(() => item.element?.remove(), 220);
       }
+
+      if (highlightedTargetNote === item.note) {
+        clearTargetHighlight();
+      }
+      updateTargetHighlight();
     }
 
     document.addEventListener("keydown", event => {
