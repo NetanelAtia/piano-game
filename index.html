@@ -720,12 +720,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 38px;
+      min-height: 42px;
       width: 100%;
+      padding: 9px 12px;
       border-radius: 13px;
       color: #e0f2fe;
       font-size: 13px;
       font-weight: 900;
+      line-height: 1.25;
+      text-align: center;
+      direction: rtl;
+      white-space: normal;
+      overflow-wrap: anywhere;
       cursor: pointer;
       background: linear-gradient(135deg, rgba(2, 132, 199, 0.78), rgba(124, 58, 237, 0.72));
       border: 1px solid rgba(125, 211, 252, 0.32);
@@ -1048,6 +1054,19 @@
         min-height: 32px;
       }
 
+      .midi-upload-btn {
+        min-height: 32px;
+        padding: 5px 7px;
+        font-size: 10px;
+        line-height: 1.15;
+        border-radius: 10px;
+      }
+
+      .midi-hint {
+        font-size: 9px;
+        line-height: 1.2;
+      }
+
       .training-actions {
         gap: 5px;
         display: grid;
@@ -1167,7 +1186,7 @@
           <option value="here_without_you">3 Doors Down — Here Without You — MIDI מובנה שהועלה</option>
         </select>
         <div class="midi-import">
-          <label class="midi-upload-btn" for="midiUpload">ייבא קובץ MID / MIDI מהמכשיר</label>
+          <label class="midi-upload-btn" for="midiUpload">ייבוא קובץ MID / MIDI מהמכשיר</label>
           <input id="midiUpload" type="file" accept=".mid,.midi,audio/midi,audio/x-midi" />
           <span class="midi-hint" id="midiHint">כולל 4 קבצי MIDI שהוספת + אפשר לייבא קובץ MIDI חיצוני. עדיף קובץ פשוט עם מלודיה ברורה.</span>
         </div>
