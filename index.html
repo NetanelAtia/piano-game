@@ -826,10 +826,32 @@
 
       .hero,
       .footer-help,
-      .mini-map-shell,
       .hit-zone-label,
       .piano-header {
         display: none;
+      }
+
+      .mini-map-shell {
+        display: block;
+        margin: 0 0 5px;
+        padding: 5px;
+        border-radius: 12px;
+      }
+
+      .mini-title {
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+
+      .mini-map {
+        height: 42px;
+        border-radius: 12px;
+      }
+
+      .viewport-box {
+        top: 2px;
+        bottom: 2px;
+        border-radius: 9px;
       }
 
       .top-bar {
@@ -937,11 +959,11 @@
       .piano {
         height: 100%;
         min-height: 160px;
-        touch-action: pan-y !important;
+        touch-action: none !important;
       }
 
       .key {
-        touch-action: pan-y !important;
+        touch-action: none !important;
       }
 
       .white-keys {
@@ -1214,6 +1236,7 @@
     let isPointerSliding = false;
     let currentPointerNote = null;
     let activePointerId = null;
+    const activePointerNotes = new Map(); // iPhone multitouch: pointerId -> noteName
 
     let score = 0;
     let combo = 0;
@@ -1736,7 +1759,10 @@
     function startSustainedNote(noteData) {
       const noteKey = noteData.note;
       if (activeOscillators.has(noteKey)) {
-        stopSustainedNote(noteKey);
+        pressVisual(noteKey);
+        activeNoteEl.textContent = noteKey;
+        checkRhythmHit(noteKey);
+        return;
       }
 
       const ctx = getAudioContext();
@@ -1896,20 +1922,51 @@
       });
     }
 
+    function releasePointerNote(pointerId) {
+      if (!activePointerNotes.has(pointerId)) return;
+
+      const noteName = activePointerNotes.get(pointerId);
+      activePointerNotes.delete(pointerId);
+
+      // אם אותו תו עדיין מוחזק על ידי אצבע אחרת — לא משחררים אותו עדיין.
+      const stillHeldByAnotherPointer = [...activePointerNotes.values()].includes(noteName);
+      if (!stillHeldByAnotherPointer) {
+        stopSustainedNote(noteName);
+      }
+
+      if (activePointerNotes.size === 0) {
+        isPointerSliding = false;
+        currentPointerNote = null;
+        activePointerId = null;
+      }
+    }
+
+    function releaseAllPointerNotes() {
+      const notesToRelease = [...new Set(activePointerNotes.values())];
+      activePointerNotes.clear();
+      notesToRelease.forEach(noteName => stopSustainedNote(noteName));
+      isPointerSliding = false;
+      currentPointerNote = null;
+      activePointerId = null;
+    }
+
     function addPointerEvents(btn, noteData) {
       btn.addEventListener("pointerdown", event => {
         event.preventDefault();
         window.getSelection?.().removeAllRanges();
+
         isPointerSliding = true;
         activePointerId = event.pointerId;
         currentPointerNote = noteData.note;
+        activePointerNotes.set(event.pointerId, noteData.note);
+
         try { btn.setPointerCapture(event.pointerId); } catch (error) {}
         startSustainedNote(noteData);
-      });
+      }, { passive: false });
     }
 
     document.addEventListener("pointermove", event => {
-      if (!isPointerSliding || event.pointerId !== activePointerId) return;
+      if (!activePointerNotes.has(event.pointerId)) return;
       event.preventDefault();
 
       const el = document.elementFromPoint(event.clientX, event.clientY);
@@ -1917,38 +1974,39 @@
       if (!keyEl) return;
 
       const nextNoteName = keyEl.dataset.note;
-      if (!nextNoteName || nextNoteName === currentPointerNote) return;
+      const prevNoteName = activePointerNotes.get(event.pointerId);
+      if (!nextNoteName || nextNoteName === prevNoteName) return;
 
       const nextNote = ALL_NOTES.find(n => n.note === nextNoteName);
       if (!nextNote) return;
 
-      if (currentPointerNote) stopSustainedNote(currentPointerNote);
+      // משחררים רק אם אף אצבע אחרת לא עדיין מחזיקה את אותו תו.
+      activePointerNotes.delete(event.pointerId);
+      const prevStillHeld = [...activePointerNotes.values()].includes(prevNoteName);
+      if (!prevStillHeld) stopSustainedNote(prevNoteName);
+
+      activePointerNotes.set(event.pointerId, nextNoteName);
       currentPointerNote = nextNoteName;
+      activePointerId = event.pointerId;
       startSustainedNote(nextNote);
     }, { passive: false });
 
     document.addEventListener("pointerup", event => {
-      if (!isPointerSliding || event.pointerId !== activePointerId) return;
+      if (!activePointerNotes.has(event.pointerId)) return;
       event.preventDefault();
-      if (currentPointerNote) stopSustainedNote(currentPointerNote);
-      isPointerSliding = false;
-      currentPointerNote = null;
-      activePointerId = null;
+      releasePointerNote(event.pointerId);
     }, { passive: false });
 
     document.addEventListener("pointercancel", event => {
-      if (event.pointerId !== activePointerId) return;
-      if (currentPointerNote) stopSustainedNote(currentPointerNote);
-      isPointerSliding = false;
-      currentPointerNote = null;
-      activePointerId = null;
+      releasePointerNote(event.pointerId);
     });
 
-    window.addEventListener("pointerup", () => {
-      if (currentPointerNote) stopSustainedNote(currentPointerNote);
-      isPointerSliding = false;
-      currentPointerNote = null;
-      activePointerId = null;
+    document.addEventListener("lostpointercapture", event => {
+      releasePointerNote(event.pointerId);
+    });
+
+    window.addEventListener("pointerup", event => {
+      releasePointerNote(event.pointerId);
     });
 
     window.addEventListener("keyup", event => {
@@ -1960,22 +2018,18 @@
     });
 
     window.addEventListener("blur", () => {
+      releaseAllPointerNotes();
       stopAllNotes();
       stopDemo();
       clearTargetHighlight();
-      isPointerSliding = false;
-      currentPointerNote = null;
-      activePointerId = null;
     });
 
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
+        releaseAllPointerNotes();
         stopAllNotes();
         pressedKeyboard.clear();
-        isPointerSliding = false;
-        currentPointerNote = null;
-        activePointerId = null;
       }
     });
 
@@ -2417,6 +2471,7 @@
       animationId = null;
       scheduledNotes = [];
       document.querySelectorAll(".fall-note").forEach(el => el.remove());
+      releaseAllPointerNotes();
       stopAllNotes();
       combo = 0;
       updateStats();
@@ -2435,6 +2490,7 @@
     function playSongDemo() {
       stopSong(false);
       stopDemo();
+      releaseAllPointerNotes();
       stopAllNotes();
       resetStats();
 
@@ -2843,6 +2899,7 @@
     stopSongBtn.addEventListener("click", () => {
       stopSong(true);
       stopDemo();
+      releaseAllPointerNotes();
       stopAllNotes();
       resetStats();
       activeNoteEl.textContent = "—";
@@ -2853,6 +2910,7 @@
     resetBtn.addEventListener("click", () => {
       stopSong(false);
       stopDemo();
+      releaseAllPointerNotes();
       stopAllNotes();
       resetStats();
       activeNoteEl.textContent = "—";
